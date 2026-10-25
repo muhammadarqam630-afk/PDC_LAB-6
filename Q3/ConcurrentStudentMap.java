@@ -54,6 +54,46 @@ public class ConcurrentStudentMap {
             throw e;
         }
 
+        int retrievedCount = 0;
+
+        for (int t = 0; t < threadCount; t++) {
+
+            for (int i = 0; i < recordsPerThread; i++) {
+
+                String key = "Student-" + t + "-" + i;
+
+                Integer value = students.get(key);
+
+                if (value == null || value.intValue() != i % 101) {
+
+                    throw new IllegalStateException(
+                        "Missing or incorrect record: " + key
+                    );
+                }
+
+                retrievedCount++;
+            }
+        }
+
+        if (students.size() != threadCount * recordsPerThread) {
+
+            throw new IllegalStateException(
+                "Unexpected number of student records."
+            );
+        }
+
+        System.out.println(
+            "Retrieved and verified entries: " + retrievedCount
+        );
+
+        System.out.println(
+            "Sample Student-0-0: " + students.get("Student-0-0")
+        );
+
+        System.out.println(
+            "Sample Student-4-999: " + students.get("Student-4-999")
+        );
+
         int expected = threadCount * recordsPerThread;
 
         System.out.println("Threads: " + threadCount);
