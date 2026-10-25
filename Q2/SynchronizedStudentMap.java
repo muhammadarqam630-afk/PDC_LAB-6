@@ -1,5 +1,4 @@
 package Q2;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,5 +39,38 @@ public class SynchronizedStudentMap {
         }
 
         executor.shutdown();
+
+        try {
+
+            if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                executor.shutdownNow();
+
+                throw new IllegalStateException(
+                    "Workers did not finish in time."
+                );
+            }
+
+        } catch (InterruptedException e) {
+
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+            throw e;
+        }
+
+        int expected = threadCount * recordsPerThread;
+
+        System.out.println("Threads: " + threadCount);
+        System.out.println("Expected entries: " + expected);
+        System.out.println("Actual entries: " + students.size());
+
+        System.out.println(
+            "Count matches: " + (students.size() == expected)
+        );
+
+        if (students.size() != expected) {
+            throw new IllegalStateException(
+                "Some student records are missing."
+            );
+        }
     }
 }
