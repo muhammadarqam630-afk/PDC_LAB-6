@@ -1,5 +1,4 @@
 package Q3;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +14,8 @@ public class ConcurrentStudentMap {
 
         ConcurrentHashMap<String, Integer> students =
             new ConcurrentHashMap<>();
+
+        long startTime = System.nanoTime();
 
         ExecutorService executor =
             Executors.newFixedThreadPool(threadCount);
@@ -75,12 +76,21 @@ public class ConcurrentStudentMap {
             }
         }
 
-        if (students.size() != threadCount * recordsPerThread) {
+        int expected = threadCount * recordsPerThread;
+
+        if (students.size() != expected) {
 
             throw new IllegalStateException(
                 "Unexpected number of student records."
             );
         }
+
+        double elapsedMs =
+            (System.nanoTime() - startTime) / 1_000_000.0;
+
+        System.out.println("Threads: " + threadCount);
+        System.out.println("Expected entries: " + expected);
+        System.out.println("Actual entries: " + students.size());
 
         System.out.println(
             "Retrieved and verified entries: " + retrievedCount
@@ -94,10 +104,10 @@ public class ConcurrentStudentMap {
             "Sample Student-4-999: " + students.get("Student-4-999")
         );
 
-        int expected = threadCount * recordsPerThread;
-
-        System.out.println("Threads: " + threadCount);
-        System.out.println("Expected entries: " + expected);
-        System.out.println("Actual entries: " + students.size());
+        System.out.printf(
+            java.util.Locale.ROOT,
+            "Execution time: %.3f ms%n",
+            elapsedMs
+        );
     }
 }
